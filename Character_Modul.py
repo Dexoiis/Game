@@ -1,90 +1,85 @@
-#------------------#
-# Character Module #
-#------------------#
+#--------------------#
+# Character_Modul.py #
+#--------------------#
 
+from dataclasses import dataclass, field
+from typing import List, Dict, Optional
+from Inventory_Modul import Inventory
+
+@dataclass
 class Character:
-    def __init__(self, name, race, char_class):
-#Hauptwerte
-        self.name = name 				# Name
-        self.race = race 				# Rasse
-        self.char_class = char_class 	# Klasse
-        self.level = 1 					# Level
-        self.xp = 0 					# Erfahrungspunkte
-        self.xp_to_next = 10 			# Startwert für lvl-UP
+    name: str
+    race: str
+    char_class: str
 
-#Hauptwerte
-        self.health = 120 				# HP
-        self.strength = 10 				# STR
-        self.mana = 60 					# MP
-        self.dexterity = 10 			# Geschick.
-        self.intelligence = 10 			# INT.
+    # Basiswerte
+    level: int = 1
+    xp: int = 0
+    xp_to_next: int = 10
 
-#Kampfwerte
-        self.attack = 10				# Basis-Angriff
-        self.defense = 8				# Physische Verteidigung
-        self.magic_defense = 5			# Magische Verteidigung
-        self.speed = 10					# Geschwindigkeit / Zugreihenfolge
-        self.crit_chance = 5			# Chance auf Krit. Treffer (%)
-        self.evasion = 8				# Ausweichchance (%)
-        self.accuracy = 90				# Trefferchance (%)
+    health: int = 120
+    mana: int = 60
+    strength: int = 10
+    dexterity: int = 10
+    intelligence: int = 10
 
-#Sekundärwerte
-        self.luck = 5					# Glück (Krit, Drops, Zufall)
-        self.resistance = 5				# Widerstand gg. Status-Effekte
+    attack: int = 5
+    defense: int = 3
+    magic_defense: int = 2
+    speed: int = 5
 
-#--------------------------------------------------#
-# Fähigkeitenliste wird durch klassen wahl befüllt #
-#--------------------------------------------------#
-        self.abilities = []
-        
-        self.bonus_health = 0
-        self.bonus_strength = 0
-        self.bonus_mana = 0
-        self.bonus_dexterity = 0
-        self.bonus_intelligence = 0
-        
-        self.draken = getattr(self, "draken", 0)
-        
-        self.equipped = getattr(self, "equipped", {
-            "waffe": None, "helm": None, "brust": None, "hose": None,
-            "schuhe": None, "amulett": None, "ring1": None, "ring2": None
-        })
-        
-        self.equip_bonus_totals = getattr(self, "equip_bonus_totals",
-                                          {"attack": 0, "defense": 0, "strength": 0, "max_health": 0 })
-        self.active_set_bonuses = getattr(self, "active_set_bonuses",
-                                          {"attack": 0, "defense": 0, "strength": 0, "max_health": 0 })
-        
-#------------------------------------#
-# Werte die bei einem lvl-UP steigen #
-#------------------------------------#
+    crit_chance: int = 5
+    evasion: int = 3
+    accuracy: int = 90
+    luck: int = 1
+    resistance: int = 0
 
-# Berechnet die max. Gesundheit anhand vom lvl.
-    def max_health(self):
-        hp_bonus = 0
-        hp_bonus += self.equip_bonus_totals.get("max_health", 0)
-        hp_bonus += self.active_set_bonuses.get("max_health", 0)
+    # ökonomisch
+    draken: int = 0
+
+    # Fortschritt/Skills
+    abilities: List[str] = field(default_factory=list)
+
+    # Ausrüstung
+    equipped: Dict[str, Optional[Dict]] = field(default_factory=lambda: {
+        "waffe": None, "helm": None, "brust": None, "hose": None,
+        "schuhe": None, "amulett": None, "ring1": None, "ring2": None
+    })
+    equip_bonus_totals: Dict[str, int] = field(default_factory=lambda: {
+        "attack": 0, "defense": 0, "strength": 0, "max_health": 0
+    })
+    active_set_bonuses: Dict[str, int] = field(default_factory=lambda: {
+        "attack": 0, "defense": 0, "strength": 0, "max_health": 0
+    })
+
+    # Bonus-Pools (z. B. durch Rasse/Klasse)
+    bonus_health: int = 0
+    bonus_strength: int = 0
+    bonus_mana: int = 0
+    bonus_dexterity: int = 0
+    bonus_intelligence: int = 0
+
+    # Inventar
+    inventory: Inventory = field(default_factory=Inventory)
+
+    # ---------- abgeleitete Max-Werte ----------
+    def max_health(self) -> int:
+        hp_bonus = self.equip_bonus_totals.get("max_health", 0) + self.active_set_bonuses.get("max_health", 0)
         return 120 + (self.level - 1) * 15 + self.bonus_health + hp_bonus
 
-# Berechnet die max. Stärke anhand vom lvl.
-    def max_strength(self):
-        return 10 + (self.level  - 1) * 2 + self.bonus_strength
-    
-# Berechnet das max. Mana abhängig vom lvl.      
-    def max_mana(self):
-        return 60 + int((self.level - 1)   * 5) + self.bonus_mana
+    def max_strength(self) -> int:
+        return 10 + (self.level - 1) * 2 + self.bonus_strength
 
-# Berechnet die max. Geschick. anhand vom lvl.
-    def max_dexterity(self):
+    def max_mana(self) -> int:
+        return 60 + int((self.level - 1) * 5) + self.bonus_mana
+
+    def max_dexterity(self) -> int:
         return 10 + (self.level - 1) * 2 + self.bonus_dexterity
-    
-# Berechnet die max. Intelligenz anhand vom lvl.
-    def max_intelligence(self):
+
+    def max_intelligence(self) -> int:
         return 10 + (self.level - 1) * 2 + self.bonus_intelligence
-    
-#-------------------------------------#       
-# Zeigt die Charakterinformationen an #
-#-------------------------------------#
+
+    # ---------- Anzeige ----------
     def show_info(self):
         print("=== Charakter Info ===")
         print(f"Name: {self.name}")
@@ -103,14 +98,12 @@ class Character:
         print(f"Draken: {self.draken}")
         if self.abilities:
             print(f"Fähigkeiten: {', '.join(self.abilities)}")
-        print("=========================================================\n")
+        print("=========================================================")
+        print()
 
-#-------------------------------------#
-# Zeigt die Ausrüstungsgegenstände an #
-#-------------------------------------#
     def show_equipment(self):
         def fmt(x):
-            return f"{x['name']} ({x['rarity']})" if x else "—"
+            return f"{x['name']} ({x.get('rarity','?')})" if x else "—"
         print("=== Ausrüstung ===")
         print(f"Waffe : {fmt(self.equipped.get('waffe'))}")
         print(f"Helm  : {fmt(self.equipped.get('helm'))}")
@@ -120,99 +113,58 @@ class Character:
         print(f"Amulett: {fmt(self.equipped.get('amulett'))}")
         print(f"Ring1 : {fmt(self.equipped.get('ring1'))}")
         print(f"Ring2 : {fmt(self.equipped.get('ring2'))}")
-        print("==================\n")
-            
-#-------------------------------------------------#
-# Erhöht das Level und verbessert die Werte/Level #
-#-------------------------------------------------#
+        print("==================")
+        print()
 
-#Nächstes level braucht doppelt so viel xp
+    # ---------- Fortschritt ----------
     def level_up(self):
         self.level += 1
-        self.xp_to_next *= 2 
-        
-#Hauptwerte Skalieren    
-        self.health = self.max_health()  
-        self.mana = self.max_mana() 
-        self.strength = self.max_strength() 
-        self.dexterity = self.max_dexterity() 
-        self.intelligence= self.max_intelligence()
-        
+        self.xp_to_next *= 2
+        self.health = self.max_health()
+        self.mana = self.max_mana()
+        self.strength = self.max_strength()
+        self.dexterity = self.max_dexterity()
+        self.intelligence = self.max_intelligence()
         self._reapply_equip_and_set_bonuses_after_base_reset()
-        
-#-----------------------------------------------------#
-# Fügt Erfahrungspunkte hinzu und prüft Levelaufstieg #
-#-----------------------------------------------------#
-    def gain_xp(self, amount):
+
+    def gain_xp(self, amount: int):
         self.xp += amount
         print(f"{self.name} erhält {amount} Erfahrungspunkte. ({self.xp}/{self.xp_to_next})")
         while self.xp >= self.xp_to_next:
             self.xp -= self.xp_to_next
             self.level_up()
-            
-#----------------------------------------#       
-# Gesundheit verändern (Schaden/Heilung) #
-#----------------------------------------#
-    def take_damage(self, amount):
+
+    # ---------- Kampf ----------
+    def take_damage(self, amount: int):
         self.health -= amount
         if self.health < 0:
             self.health = 0
         print(f"{self.name} hat {amount} Schaden genommen. Gesundheit: {self.health}/{self.max_health()}")
 
-    def heal(self, amount):
-        """Heilt den Charakter um einen bestimmten Wert."""
+    def heal(self, amount: int):
         self.health += amount
         if self.health > self.max_health():
             self.health = self.max_health()
         print(f"{self.name} wurde um {amount} geheilt. Gesundheit: {self.health}/{self.max_health()}")
 
+    # ---------- Equip-Boni anwenden ----------
     def _reapply_equip_and_set_bonuses_after_base_reset(self):
         eq = getattr(self, "equip_bonus_totals", {})
         for stat in ("attack", "defense", "strength"):
-            self.__dict__[stat] = self.__dict__.get(stat, 0) + int(eq.get(stat, 0))
-       
+            self.__dict__[stat] = int(self.__dict__.get(stat, 0)) + int(eq.get(stat, 0))
+
         sb = getattr(self, "active_set_bonuses", {})
         for stat in ("attack", "defense", "strength"):
-            self.__dict__[stat] = self.__dict__.get(stat, 0) + int(sb.get(stat, 0))
-
-#------------------------------------------#
-# Sicherheit Aktuelle HP nicht über Max HP #
-#------------------------------------------#
+            self.__dict__[stat] = int(self.__dict__.get(stat, 0)) + int(sb.get(stat, 0))
 
         if self.health > self.max_health():
             self.health = self.max_health()
-            
+
+    # Alias für Draken
     @property
-    def gold(self):
+    def gold(self) -> int:
         return self.draken
+
     @gold.setter
-    def gold(self, value):
+    def gold(self, value: int):
         self.draken = int(value)
-
-#--------------#
-# Testfunktion #
-#--------------#
-def test_character():
-    hero = Character("Arthas", "Mensch", "Krieger")
-
-# Startwerte anzeigen
-    hero.show_info()
-
-# sollte ein Level-Up auslösen
-    hero.gain_xp(10)  
-    hero.show_info()
-
-# Schaden nehmen
-    hero.take_damage(15)
-
-# Heilung testen
-    hero.heal(20)
-
-# Mehr XP für weiteres Level-Up (z. B. 35)
-    hero.gain_xp(20)
-    hero.show_info()
-
-
-# Test ausführen
-if __name__ == "__main__":
-    test_character()

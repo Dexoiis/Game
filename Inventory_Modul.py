@@ -1,4 +1,6 @@
-# inventory_module.py
+#-------------------#
+# Inventory_Modul   #
+#-------------------#
 
 from Item_Modul import Items
 
@@ -17,6 +19,7 @@ class InventoryItem:
             if "Heil" in self.name:
                 player.heal(20)
             elif "Mana" in self.name:
+                # Falls ein Mana-System gewünscht ist, hier erweitern
                 print(f"{player.name} stellt 20 Mana wieder her!")
             self.quantity -= 1
             return self.quantity <= 0
@@ -31,15 +34,14 @@ class InventoryItem:
 class Inventory:
     def __init__(self, max_slots=30):
         self.max_slots = max_slots
-        self.items = []
+        self.items = []  # list[InventoryItem]
 
     def find_category(self, name, rarity):
         """Sucht die Kategorie eines Items im Items-Dictionary."""
         if rarity not in Items:
             return "sonstiges"
-
         for category, monsters in Items[rarity].items():
-            for monster, loot in monsters.items():
+            for _monster, loot in monsters.items():
                 if name in loot:
                     return category
         return "sonstiges"
@@ -47,15 +49,14 @@ class Inventory:
     def add_item(self, name, rarity="gewöhnlich", quantity=1):
         """Item hinzufügen: Name + Rarität reichen, Kategorie wird automatisch gefunden."""
         category = self.find_category(name, rarity)
-
-        # Stack-Regeln (z. B. Tränke und Münzen stacken)
         stackable = category in ["trank", "sonstiges"]
 
         for inv_item in self.items:
-            if inv_item.name == name and inv_item.rarity == rarity:
-                if inv_item.quantity + quantity <= inv_item.max_stack:
-                    inv_item.quantity += quantity
-                    return True
+            if inv_item.name == name and inv_item.rarity == rarity and inv_item.stackable:
+                new_qty = min(inv_item.quantity + quantity, inv_item.max_stack)
+                added = new_qty - inv_item.quantity
+                inv_item.quantity = new_qty
+                return added > 0
 
         if len(self.items) < self.max_slots:
             self.items.append(InventoryItem(name, category, rarity, quantity, stackable))
@@ -65,7 +66,7 @@ class Inventory:
             return False
 
     def remove_item(self, name, quantity=1):
-        for inv_item in self.items:
+        for inv_item in list(self.items):
             if inv_item.name == name:
                 inv_item.quantity -= quantity
                 if inv_item.quantity <= 0:
@@ -75,7 +76,7 @@ class Inventory:
         return False
 
     def use_item(self, name, player):
-        for inv_item in self.items:
+        for inv_item in list(self.items):
             if inv_item.name == name:
                 if inv_item.use(player):
                     self.items.remove(inv_item)

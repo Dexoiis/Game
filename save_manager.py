@@ -15,8 +15,7 @@ def save_character(character):
     """Speichert den aktuellen Spielstand des Charakters."""
     filename = f"save_{character.name}.json"
     path = os.path.join(SAVE_FOLDER, filename)
-        data = character.__dict__.copy()
-    data["inventory"] = [item.__dict__ for item in character.inventory.items]
+    data = character.__dict__
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
     print(f"✅ Spielstand gespeichert unter {filename}!")

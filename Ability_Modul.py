@@ -22,5 +22,5 @@ ABILITIES = {
     "Todesstoß": {"damage": 35, "mana_cost": 20},
     "Rauchbombe": {"damage": 0, "mana_cost": 8},
     "Sprengflasche": {"damage": 24, "mana_cost": 10},
-    "Heiltrank": {"damage": -20, "mana_cost": 5}
+    "Heiltrank": {"damage": -20, "mana_cost": 5},
 }
