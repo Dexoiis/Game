@@ -87,8 +87,6 @@ def fight(player, enemy):
             dropped = enemy.drop_item()
             if dropped:
                 print(f"{player.name} erhält: {dropped}")
-            save_character(player)
-            print("\n✅ Spielstand gespeichert!\n")
 
             break
 #------------------#
