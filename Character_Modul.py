@@ -36,6 +36,7 @@ class Character:
 # Fähigkeitenliste wird durch klassen wahl befüllt #
 #--------------------------------------------------#
         self.abilities = []
+        self.ability_cooldowns = {}
         
         self.bonus_health = 0
         self.bonus_strength = 0
@@ -166,6 +167,12 @@ class Character:
         if self.health > self.max_health():
             self.health = self.max_health()
         print(f"{self.name} wurde um {amount} geheilt. Gesundheit: {self.health}/{self.max_health()}")
+
+    def reduce_cooldowns(self):
+        """Senkt alle aktiven Fähigkeits-Cooldowns um 1."""
+        for ab in list(self.ability_cooldowns.keys()):
+            if self.ability_cooldowns[ab] > 0:
+                self.ability_cooldowns[ab] -= 1
 
     def _reapply_equip_and_set_bonuses_after_base_reset(self):
         eq = getattr(self, "equip_bonus_totals", {})

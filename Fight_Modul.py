@@ -13,6 +13,7 @@ from Ability_Modul import ABILITIES, use_ability
 def fight(player, enemy):
     active_def_buff = 0
     while player.health > 0 and enemy.is_alive():
+        player.reduce_cooldowns()
         print("\n--- Deine Runde ---")
         print("1) Angreifen")
         print("2) Heilen (10 HP)")
@@ -56,7 +57,9 @@ def fight(player, enemy):
                 if info.get("defense"):
                     parts.append(f"DEF:{info['defense']}")
                 stats = ", ".join(parts)
-                print(f"{i}) {ab} (Mana:{cost}{', ' + stats if stats else ''})")
+                cd_left = player.ability_cooldowns.get(ab, 0)
+                cd_info = f", CD:{cd_left}" if cd_left > 0 else ""
+                print(f"{i}) {ab} (Mana:{cost}{cd_info}{', ' + stats if stats else ''})")
             try:
                 idx = int(input("Fähigkeit wählen: ")) - 1
             except ValueError:
