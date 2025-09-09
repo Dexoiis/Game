@@ -8,7 +8,6 @@ import time
 
 from Character_Modul import Character
 from Enemy_Modul import Enemy
-from save_manager import save_character, load_character
 from Fight_Modul import fight
 
 #------------------------#
@@ -245,9 +244,9 @@ def ausruhen(player):
         if player.health >= player.max_health():
             print("Du bist voll geheilt.")
             break
-        time.sleep(1)
-        player.heal(5)
-        print(f"+5 HP ({player.health}/{player.max_health()})")
+        time.sleep(0)
+        player.heal(2)
+        print(f"+2 HP ({player.health}/{player.max_health()})")
     print("Ausruhe-Phase beendet.\n")
 
 
@@ -256,7 +255,7 @@ def hub(player):
     while True:
         print("\n=== Hauptmenü ===")
         print("1) Kampf starten")
-        print("2) Ausruhen (+5 HP/Sek.)")
+        print("2) Ausruhen (+2 HP/Sek.)")
         print("3) Charakter anzeigen")
         print("4) Spielstand speichern")
         print("0) Zurück zum Titel")

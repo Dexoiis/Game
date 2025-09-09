@@ -3,7 +3,6 @@
 #----------------#
 
 import random
-from save_manager import save_character
 from Item_Modul import Items
 
 #------------------------#
