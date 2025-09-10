@@ -222,6 +222,7 @@ def hauptmenue_loop():
 
 
 def naechster_kampf(player):
+    clear()
     enemy = Enemy(player.level)
     enemy.show_info()
     result = fight(player, enemy)
@@ -232,6 +233,7 @@ def naechster_kampf(player):
 
 
 def ausruhen(player):
+    clear()
     print("\n=== Ausruhen ===")
     try:
         secs = int(input("Wie viele Sekunden möchtest du ausruhen? ").strip() or "0")
@@ -251,6 +253,7 @@ def ausruhen(player):
 def hub(player):
     """Spiel-Hub. Rückkehr (0) bringt dich zurück zum Titelmenü."""
     while True:
+        clear()
         print("\n=== Hauptmenü ===")
         print("1) Kampf starten")
         print("2) Ausruhen (+1 HP/Sek.)")

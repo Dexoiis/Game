@@ -2,10 +2,19 @@
 # Kampf-Funktion #
 #----------------#
 
+import os
 import random
 from save_manager import save_character
 from Item_Modul import Items
 from Ability_Modul import ABILITIES, use_ability
+
+
+def clear():
+    """Einfaches Konsolen-Clearing."""
+    try:
+        os.system("cls" if os.name == "nt" else "clear")
+    except Exception:
+        pass
 
 #------------------------#
 # Runden Basierter Kampf #
@@ -14,65 +23,75 @@ def fight(player, enemy):
     active_def_buff = 0
     while player.health > 0 and enemy.is_alive():
         player.reduce_cooldowns()
-        print("\n--- Deine Runde ---")
-        print("1) Angreifen")
-        print("2) Heilen (10 HP)")
-        print("3) Fliehen")
-        if getattr(player, "abilities", []):
-            print("4) Fähigkeit wirken")
+        while True:
+            clear()
+            print("\n--- Deine Runde ---")
+            print("1) Angreifen")
+            print("2) Heilen (10 HP)")
+            print("3) Fliehen")
+            if getattr(player, "abilities", []):
+                print("4) Fähigkeit wirken")
 
-        choice = input("Wähle deine Aktion: ")
+            choice = input("Wähle deine Aktion: ")
 
 #-------------------#
 # Spieler greift an #
 #-------------------#
-        if choice == "1":
-            crit_roll = random.randint(1, 100)
-            base = player.attack + player.strength + random.randint(0, 5)
-            if crit_roll <= player.crit_chance:
-                base *= 2
-                print("💥 Kritischer Treffer!")
-            damage = max(0, base - enemy.defense)
-            print(f"{player.name} greift {enemy.type_name} an und verursacht {damage} Schaden!")
-            enemy.take_damage(damage)
+            if choice == "1":
+                crit_roll = random.randint(1, 100)
+                base = player.attack + player.strength + random.randint(0, 5)
+                if crit_roll <= player.crit_chance:
+                    base *= 2
+                    print("💥 Kritischer Treffer!")
+                damage = max(0, base - enemy.defense)
+                print(f"{player.name} greift {enemy.type_name} an und verursacht {damage} Schaden!")
+                enemy.take_damage(damage)
+                break
 
-        elif choice == "2":
-            player.heal(10)
-            print(f"{player.name} heilt 20 HP.")
+            elif choice == "2":
+                player.heal(10)
+                print(f"{player.name} heilt 20 HP.")
+                break
 
-        elif choice == "3":
-            print(f"{player.name} flieht vor {enemy.type_name}!")
-            return
+            elif choice == "3":
+                print(f"{player.name} flieht vor {enemy.type_name}!")
+                return
 
-        elif choice == "4" and getattr(player, "abilities", []):
-            print("Verfügbare Fähigkeiten:")
-            for i, ab in enumerate(player.abilities, 1):
-                info = ABILITIES.get(ab, {})
-                cost = info.get("mana", 0)
-                parts = []
-                if info.get("damage"):
-                    parts.append(f"DMG:{info['damage']}")
-                if info.get("heal"):
-                    parts.append(f"HEAL:{info['heal']}")
-                if info.get("defense"):
-                    parts.append(f"DEF:{info['defense']}")
-                stats = ", ".join(parts)
-                cd_left = player.ability_cooldowns.get(ab, 0)
-                cd_info = f", CD:{cd_left}" if cd_left > 0 else ""
-                print(f"{i}) {ab} (Mana:{cost}{cd_info}{', ' + stats if stats else ''})")
-            try:
-                idx = int(input("Fähigkeit wählen: ")) - 1
-            except ValueError:
-                idx = -1
-            if 0 <= idx < len(player.abilities):
-                ability_name = player.abilities[idx]
-                buff = use_ability(player, ability_name, enemy)
-                if buff:
-                    active_def_buff = buff
+            elif choice == "4" and getattr(player, "abilities", []):
+                print("Verfügbare Fähigkeiten:")
+                for i, ab in enumerate(player.abilities, 1):
+                    info = ABILITIES.get(ab, {})
+                    cost = info.get("mana", 0)
+                    parts = []
+                    if info.get("damage"):
+                        parts.append(f"DMG:{info['damage']}")
+                    if info.get("heal"):
+                        parts.append(f"HEAL:{info['heal']}")
+                    if info.get("defense"):
+                        parts.append(f"DEF:{info['defense']}")
+                    stats = ", ".join(parts)
+                    cd_left = player.ability_cooldowns.get(ab, 0)
+                    cd_info = f", CD:{cd_left}" if cd_left > 0 else ""
+                    print(f"{i}) {ab} (Mana:{cost}{cd_info}{', ' + stats if stats else ''})")
+                print("0) Zurück")
+                try:
+                    idx = int(input("Fähigkeit wählen: ").strip()) - 1
+                except ValueError:
+                    idx = -1
+                if idx == -1:
+                    print("Aktion abgebrochen.")
+                    continue
+                if 0 <= idx < len(player.abilities):
+                    ability_name = player.abilities[idx]
+                    buff = use_ability(player, ability_name, enemy)
+                    if buff:
+                        active_def_buff = buff
+                    break
+                else:
+                    print("Ungültige Auswahl!")
+                    continue
             else:
-                print("Ungültige Auswahl!")
-        else:
-            print("Ungültige Auswahl! Du verlierst deinen Zug.")
+                print("Ungültige Auswahl! Bitte erneut.")
 
 #---------------------------#
 # Prüfen, ob Gegner tot ist #
