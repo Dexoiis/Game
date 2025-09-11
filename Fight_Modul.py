@@ -7,6 +7,7 @@ import random
 from save_manager import save_character
 from Item_Modul import Items
 from Ability_Modul import ABILITIES, use_ability
+from Player_Modul import add_loot_to_inventory
 
 
 def clear():
@@ -103,10 +104,12 @@ def fight(player, enemy):
             print(f"🏆 {enemy.type_name} besiegt!")
             print(f"{player.name} erhält {enemy.exp_reward} XP!")
             player.gain_xp(enemy.exp_reward)
+            if hasattr(player, "quest_manager"):
+                player.quest_manager.update_progress("kill", enemy.type_name)
             dropped = enemy.drop_item()
             if dropped:
                 print(f"{player.name} erhält: {dropped}")
-
+                add_loot_to_inventory(player, dropped)
             break
 #------------------#
 # Gegner greift an #
@@ -130,3 +133,4 @@ def fight(player, enemy):
 #---------------------------------------#
 # Spielstand speichern nach jeder Runde #
 #---------------------------------------#
+
