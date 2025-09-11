@@ -38,20 +38,6 @@ ABILITIES = {
 }
 
 
-def register_ability(name: str, attributs: dict) -> None:
-    """Registriert eine neue Fähigkeit.
-
-    Parameters
-    ----------
-    name : str
-        Bezeichnung der Fähigkeit.
-    attributs : dict
-        Werte der Fähigkeit (z.B. Schaden, Mana-Kosten, Cooldown).
-    """
-
-    ABILITIES[name] = attributs
-
-
 def use_ability(user, ability_name: str, target: Optional[object] = None) -> int:
     """Wendet eine Fähigkeit an.
 
@@ -120,6 +106,5 @@ def use_ability(user, ability_name: str, target: Optional[object] = None) -> int
         bonus = defense
 
     cooldowns[ability_name] = spell.get("cooldown", 0)
-
 
     return bonus

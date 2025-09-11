@@ -7,7 +7,6 @@ import random
 from save_manager import save_character
 from Item_Modul import Items
 from Ability_Modul import ABILITIES, use_ability
-from Player_Modul import add_loot_to_inventory
 
 
 def clear():
@@ -28,7 +27,7 @@ def fight(player, enemy):
             clear()
             print("\n--- Deine Runde ---")
             print("1) Angreifen")
-            print("2) Heilen (20 HP)")
+            print("2) Heilen (10 HP)")
             print("3) Fliehen")
             if getattr(player, "abilities", []):
                 print("4) Fähigkeit wirken")
@@ -50,7 +49,7 @@ def fight(player, enemy):
                 break
 
             elif choice == "2":
-                player.heal(20)
+                player.heal(10)
                 print(f"{player.name} heilt 20 HP.")
                 break
 
@@ -59,12 +58,8 @@ def fight(player, enemy):
                 return
 
             elif choice == "4" and getattr(player, "abilities", []):
-                available = [ab for ab in player.abilities if ab in ABILITIES]
-                if not available:
-                    print("Keine Fähigkeiten verfügbar.")
-                    continue
                 print("Verfügbare Fähigkeiten:")
-                for i, ab in enumerate(available, 1):
+                for i, ab in enumerate(player.abilities, 1):
                     info = ABILITIES.get(ab, {})
                     cost = info.get("mana", 0)
                     parts = []
@@ -86,8 +81,8 @@ def fight(player, enemy):
                 if idx == -1:
                     print("Aktion abgebrochen.")
                     continue
-                if 0 <= idx < len(available):
-                    ability_name = available[idx]
+                if 0 <= idx < len(player.abilities):
+                    ability_name = player.abilities[idx]
                     buff = use_ability(player, ability_name, enemy)
                     if buff:
                         active_def_buff = buff
@@ -108,12 +103,10 @@ def fight(player, enemy):
             print(f"🏆 {enemy.type_name} besiegt!")
             print(f"{player.name} erhält {enemy.exp_reward} XP!")
             player.gain_xp(enemy.exp_reward)
-            if hasattr(player, "quest_manager"):
-                player.quest_manager.update_progress("kill", enemy.type_name)
             dropped = enemy.drop_item()
             if dropped:
                 print(f"{player.name} erhält: {dropped}")
-                add_loot_to_inventory(player, dropped)
+
             break
 #------------------#
 # Gegner greift an #
@@ -133,11 +126,7 @@ def fight(player, enemy):
         if player.health <= 0:
             print(f"💀 {player.name} wurde besiegt!")
             break
-
-        # Spielstand speichern nach jeder Runde
-        save_character(player)
-
-        save_character(player)
-
-
-
+        
+#---------------------------------------#
+# Spielstand speichern nach jeder Runde #
+#---------------------------------------#

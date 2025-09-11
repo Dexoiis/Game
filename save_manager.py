@@ -5,7 +5,6 @@
 import json
 import os
 from Character_Modul import Character
-from Quest_Modul import QuestManager
 
 SAVE_FOLDER = "saves"
 
@@ -16,9 +15,7 @@ def save_character(character):
     """Speichert den aktuellen Spielstand des Charakters."""
     filename = f"save_{character.name}.json"
     path = os.path.join(SAVE_FOLDER, filename)
-    data = dict(character.__dict__)
-    data["inventory"] = getattr(character, "inventory", [])
-    data["equipped"] = getattr(character, "equipped", {})
+    data = character.__dict__
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
     print(f"✅ Spielstand gespeichert unter {filename}!")
@@ -33,19 +30,19 @@ def list_saves():
 def load_character(filename):
     """Lädt einen Spielstand aus der Datei."""
     path = os.path.join(SAVE_FOLDER, filename)
-
-    if not os.path.isfile(path):
-        print("⚠️ Kein Spielstand gefunden. Starte einen neuen Charakter.")
-        return Character("Held", "Mensch", "Krieger")
-
     try:
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        character = Character.from_dict(data)
+        character = Character(
+            name=data["name"],
+            race=data["race"],
+            char_class=data["char_class"]
+        )
+        character.__dict__.update(data)
         return character
     except FileNotFoundError:
         print("⚠️ Datei nicht gefunden.")
         return None
 
-
-
+        print("⚠️ Kein Spielstand gefunden. Starte ein neues Spiel.")
+        return None
