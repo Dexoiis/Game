@@ -45,6 +45,8 @@ def add_loot_to_inventory(player, item_name: str):  # <<< NEU
     _ensure_player_fields(player)
     player.inventory.append(item_name)
     print(f"📦 {item_name} ins Inventar gelegt.")
+    if hasattr(player, "quest_manager"):
+        player.quest_manager.update_progress("collect", item_name)
 
 def _apply_all_equip_bonuses(player):  # <<< NEU
     """Equip-Boni zusammenfassen und anwenden."""
@@ -192,3 +194,4 @@ def rest_until_enter(player):  # <<< NEU
         time.sleep(1)
 
     print(f"🏕️ Ausruhen beendet. HP: {player.health}/{player.max_health()}")
+
