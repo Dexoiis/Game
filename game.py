@@ -259,6 +259,7 @@ def hub(player):
         print("2) Ausruhen (+1 HP/Sek.)")
         print("3) Charakter anzeigen")
         print("4) Spielstand speichern")
+        print("5) Quests anzeigen")
         print("0) Zurück zum Titel")
         choice = input("→ ").strip()
 
@@ -272,8 +273,15 @@ def hub(player):
                 player.show_equipment()
         elif choice == "4":
             save_character(player)
+        elif choice == "5":
+            if hasattr(player, "quest_manager"):
+                print(player.quest_manager.get_status())
+            else:
+                print("Keine Quests.")
+            input("Weiter mit Enter…")
         elif choice == "0":
             print("Zurück zum Titel …")
+            return             # zurück nach start_game()
             return             # zurück nach start_game()
         else:
             print("Ungültig.")
@@ -291,3 +299,4 @@ def start_game():
             print("Spiel beendet.")
             return
         hub(char)  # Danach geht's automatisch wieder ins Titelmenü
+
