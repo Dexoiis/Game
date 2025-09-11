@@ -28,7 +28,7 @@ def fight(player, enemy):
             clear()
             print("\n--- Deine Runde ---")
             print("1) Angreifen")
-            print("2) Heilen (10 HP)")
+            print("2) Heilen (20 HP)")
             print("3) Fliehen")
             if getattr(player, "abilities", []):
                 print("4) Fähigkeit wirken")
@@ -50,7 +50,7 @@ def fight(player, enemy):
                 break
 
             elif choice == "2":
-                player.heal(10)
+                player.heal(20)
                 print(f"{player.name} heilt 20 HP.")
                 break
 
@@ -134,6 +134,10 @@ def fight(player, enemy):
             print(f"💀 {player.name} wurde besiegt!")
             break
 
+        # Spielstand speichern nach jeder Runde
         save_character(player)
+
+        save_character(player)
+
 
 
