@@ -33,21 +33,23 @@ def list_saves():
 def load_character(filename):
     """Lädt einen Spielstand aus der Datei."""
     path = os.path.join(SAVE_FOLDER, filename)
+
+    if not os.path.isfile(path):
+        print("⚠️ Kein Spielstand gefunden. Starte einen neuen Charakter.")
+        return Character("Held", "Mensch", "Krieger")
+
     try:
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        qm_data = data.pop("quest_manager", None)
-        character = Character(
-            name=data["name"],
-            race=data["race"],
-            char_class=data["char_class"]
-        )
-        character.__dict__.update(data)
-        if qm_data:
-            character.quest_manager = QuestManager.from_dict(qm_data)
-        else:
-            character.quest_manager = QuestManager()
-        return character
-    except FileNotFoundError:
-        print("⚠️ Datei nicht gefunden.")
-        return None
+    except json.JSONDecodeError:
+        print("⚠️ Speicherstand beschädigt oder ungültig.")
+        return Character("Held", "Mensch", "Krieger")
+
+    character = Character(
+        name=data["name"],
+        race=data["race"],
+        char_class=data["char_class"]
+    )
+    character.__dict__.update(data)
+    return character
+
