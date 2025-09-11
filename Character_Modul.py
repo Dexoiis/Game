@@ -134,7 +134,7 @@ class Character:
 #Nächstes level braucht doppelt so viel xp
     def level_up(self):
         self.level += 1
-        self.xp_to_next *= 2 
+        self.xp_to_next *= 2
         
 #Hauptwerte Skalieren    
         self.health = self.max_health()  
@@ -143,8 +143,9 @@ class Character:
         self.dexterity = self.max_dexterity() 
         self.intelligence= self.max_intelligence()
         self.strength= self.max_strength()
-        
+
         self._reapply_equip_and_set_bonuses_after_base_reset()
+        self.reset_cooldowns()
         
 #-----------------------------------------------------#
 # Fügt Erfahrungspunkte hinzu und prüft Levelaufstieg #
@@ -178,6 +179,11 @@ class Character:
             if self.ability_cooldowns[ab] > 0:
                 self.ability_cooldowns[ab] -= 1
 
+    def reset_cooldowns(self):
+        """Setzt alle Fähigkeits-Cooldowns auf 0."""
+        for ab in list(self.ability_cooldowns.keys()):
+            self.ability_cooldowns[ab] = 0
+
     def _reapply_equip_and_set_bonuses_after_base_reset(self):
         eq = getattr(self, "equip_bonus_totals", {})
         for stat in ("attack", "defense", "strength"):
@@ -200,6 +206,18 @@ class Character:
     @gold.setter
     def gold(self, value):
         self.draken = int(value)
+
+    def to_dict(self):
+        """Gibt den Charakterzustand als dict zurück."""
+        return self.__dict__.copy()
+
+    @classmethod
+    def from_dict(cls, data):
+        """Erstellt einen Charakter aus gespeicherten Daten."""
+        char = cls(data["name"], data["race"], data["char_class"])
+        char.__dict__.update(data)
+        char.ability_cooldowns = data.get("ability_cooldowns", {})
+        return char
 
 #--------------#
 # Testfunktion #
@@ -230,3 +248,4 @@ if __name__ == "__main__":
     test_character()
 
     
+
