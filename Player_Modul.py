@@ -198,3 +198,4 @@ def rest_until_enter(player):  # <<< NEU
 
     print(f"🏕️ Ausruhen beendet. HP: {player.health}/{player.max_health()}")
 
+
