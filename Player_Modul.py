@@ -39,11 +39,14 @@ def _ensure_player_fields(player):  # <<< NEU
         player.draken = 0
     if not hasattr(player, "equip_bonus_totals"):
         player.equip_bonus_totals = {}
+    if not hasattr(player, "new_loot"):
+        player.new_loot = []
 
 def add_loot_to_inventory(player, item_name: str):  # <<< NEU
     """Loot als einfacher String ins Inventar legen."""
     _ensure_player_fields(player)
     player.inventory.append(item_name)
+    player.new_loot.append(item_name)
     print(f"📦 {item_name} ins Inventar gelegt.")
 
 def _apply_all_equip_bonuses(player):  # <<< NEU
@@ -157,7 +160,8 @@ def inventory_menu(player):  # <<< NEU
             for it in player.inventory:
                 counts[it] = counts.get(it, 0) + 1
             for i, (name, qty) in enumerate(sorted(counts.items()), 1):
-                print(f"{i}) {name} x{qty}")
+                marker = " (neu)" if name in getattr(player, "new_loot", []) else ""
+                print(f"{i}) {name} x{qty}{marker}")
         print("\n[A]usrüsten  [U]nablegen  [B]enutzen  [V]erkaufen  [Z]urück")
         choice = input("> ").strip().lower()
         if choice == "a":
@@ -173,6 +177,7 @@ def inventory_menu(player):  # <<< NEU
             item = input("Itemname zum Verkaufen: ").strip()
             sell_item(player, item)
         elif choice == "z":
+            player.new_loot = []
             break
         else:
             print("Ungültig.")
@@ -192,3 +197,4 @@ def rest_until_enter(player):  # <<< NEU
         time.sleep(1)
 
     print(f"🏕️ Ausruhen beendet. HP: {player.health}/{player.max_health()}")
+
