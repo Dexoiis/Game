@@ -1,3 +1,5 @@
+from Quest_Modul import QuestManager
+
 #------------------#
 # Character Module #
 #------------------#
@@ -55,6 +57,8 @@ class Character:
                                           {"attack": 0, "defense": 0, "strength": 0, "max_health": 0 })
         self.active_set_bonuses = getattr(self, "active_set_bonuses",
                                           {"attack": 0, "defense": 0, "strength": 0, "max_health": 0 })
+
+        self.quest_manager = getattr(self, "quest_manager", QuestManager())
         
 #------------------------------------#
 # Werte die bei einem lvl-UP steigen #
@@ -224,4 +228,5 @@ def test_character():
 # Test ausführen
 if __name__ == "__main__":
     test_character()
+
     
