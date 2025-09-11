@@ -7,7 +7,6 @@ import random
 from save_manager import save_character
 from Item_Modul import Items
 from Ability_Modul import ABILITIES, use_ability
-from Player_Modul import add_loot_to_inventory
 
 
 def clear():
@@ -107,7 +106,6 @@ def fight(player, enemy):
             dropped = enemy.drop_item()
             if dropped:
                 print(f"{player.name} erhält: {dropped}")
-                add_loot_to_inventory(player, dropped)
 
             break
 #------------------#
@@ -132,4 +130,3 @@ def fight(player, enemy):
 #---------------------------------------#
 # Spielstand speichern nach jeder Runde #
 #---------------------------------------#
-

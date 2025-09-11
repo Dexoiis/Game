@@ -3,7 +3,6 @@
 # -------------#
 
 import random
-from Item_Modul import Items, DROP_RAT
 
 #---------------#
 # Monster Typen #
@@ -189,31 +188,14 @@ class Enemy:
 #----------------------#
 # Drop Items berechnen #
 #----------------------#
-    #----------------------#
-    # Drop Items berechnen #
-    #----------------------#
     def drop_item(self):
-        if random.random() > self.drop_rate:
-            return None
-
-        rarities = list(DROP_RATE.keys())
-        weights = [DROP_RATE[r] for r in rarities]
-        rarity = random.choices(rarities, weights=weights)[0]
-
-        candidates = []
-        for category, enemy_map in Items.get(rarity, {}).items():
-            candidates.extend(enemy_map.get(self.type_name, []))
-
-        if not candidates:
-            candidates = self.loot_table
-
-        if not candidates:
-            return None
-
-        item = random.choice(candidates)
-        self.dropped_items.append(item)
-        print(f"{self.type_name} droppt: {item}")
-        return item
+        if random.random() <= self.drop_rate:
+            # Platzhalter für Item - kann später durch Item-Modul ersetzt werden
+            item = random.choice(["Trank", "Schwert", "Rüstung", "Bogen"])
+            self.dropped_items.append(item)
+            print(f"{self.type_name} droppt: {item}")
+            return item
+        return None
 
 #-------------------#
 # Anzeige der Stats #
@@ -241,4 +223,3 @@ if __name__ == "__main__":
     # Beispielkampf: Jeder Gegner droppt Items
     for e in enemies:
         e.drop_item()
-
