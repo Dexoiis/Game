@@ -59,8 +59,12 @@ def fight(player, enemy):
                 return
 
             elif choice == "4" and getattr(player, "abilities", []):
+                available = [ab for ab in player.abilities if ab in ABILITIES]
+                if not available:
+                    print("Keine Fähigkeiten verfügbar.")
+                    continue
                 print("Verfügbare Fähigkeiten:")
-                for i, ab in enumerate(player.abilities, 1):
+                for i, ab in enumerate(available, 1):
                     info = ABILITIES.get(ab, {})
                     cost = info.get("mana", 0)
                     parts = []
@@ -82,8 +86,8 @@ def fight(player, enemy):
                 if idx == -1:
                     print("Aktion abgebrochen.")
                     continue
-                if 0 <= idx < len(player.abilities):
-                    ability_name = player.abilities[idx]
+                if 0 <= idx < len(available):
+                    ability_name = available[idx]
                     buff = use_ability(player, ability_name, enemy)
                     if buff:
                         active_def_buff = buff
@@ -129,8 +133,7 @@ def fight(player, enemy):
         if player.health <= 0:
             print(f"💀 {player.name} wurde besiegt!")
             break
-        
-#---------------------------------------#
-# Spielstand speichern nach jeder Runde #
-#---------------------------------------#
+
+        save_character(player)
+
 
